@@ -128,12 +128,16 @@ $(document).ready(function () {
 <h1>Machine Learning submission</h1>
 <p>The goal of this project is to look at a training data set that came from accelerometers on the belt, forearm, and dumbell of 6 participants which were asked to perform the exersizes correctly and incorrectly in 5 different ways. Using this data, we are to build a model and decide if the test set of 20 activities are doing the excersize corrrectly, or incorrectly. In general we will follow the following process. 1. load the data into a data frame 2. Check for data problems such as: irrelevant columns, missing values, out of range, etc. 3. Prepare the data for processing 4. Split or partition the data into training and testing data frames 5. Make sure classe a factor variable. 6. Create a data model from the training data using the train function 7. Use predict function to run the testing data through the model created by training data. 8. use the confusionmatrix to compare accuracy of model 9. predict the values from the 20 example observations and get the results ##About the Data set…</p>
 <p>The training data used for this project are available here:</p>
-<p><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">Link</a></p>
+<p><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a></p>
 <p>The test data are available here:</p>
-<p><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">link</a> Note: this pml-testing data contains 20 cases which we will use to predict if person is doing the exercise correctly.</p>
-<p>The description for this project comes from this source: <a href="http://groupware.les.inf.puc-rio.br/har">link</a> Let’s set up the environment.</p>
+<p><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a> Note: this pml-testing data contains 20 cases which we will use to predict if person is doing the exercise correctly.</p>
+<p>The description for this project comes from this source: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a> Let’s set up the environment.</p>
+<pre class="r"><code># load the training and test data sets
+# Load libraries necessary for processing... caret,randomforest, etc
+library(caret)</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
 <pre><code>## Loading required package: ggplot2</code></pre>
+<pre class="r"><code>library(randomForest)</code></pre>
 <pre><code>## randomForest 4.6-12</code></pre>
 <pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
 <pre><code>## 
@@ -141,6 +145,9 @@ $(document).ready(function () {
 <pre><code>## The following object is masked from 'package:ggplot2':
 ## 
 ##     margin</code></pre>
+<pre class="r"><code>library(base)
+library(e1071)
+set.seed(123)</code></pre>
 <p>The easiest way to reduce processing time and increase accuracy is to reduce the number of variables and keep only relevant variables. To do this, I looked at the prediction data set(the dataset that has 20 rows). Below are a list of steps in regard to the data cleansing process. 1. When looking at how to process the training data, I first looked at the “Testing data”, the set of 20 observations you need to predict from. As you are looking at the Testing data set, you notice that most of the colums are NAs. When we eliminate those columns, data seems to be rather clean. Kind of surprised really. 2. I will then get rid of the names, time and date fields, and finally, the #DIV/0! entries. As stated above, #DIV/0! text was resolved by eliminating the columns that had NA on the testset(20 observations to validate on) 3. I also saw no need to remove the new_window= yes entries since the #DIV/0! entries were eliminated in step 4. I was originally going to remove the “new_window ==yes” entries but found no need to do so.</p>
 <pre class="r"><code>#Read the 2 data sets
 `trainingset` &lt;- read.csv(url(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;))

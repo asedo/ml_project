@@ -22,16 +22,17 @@ In general we will follow the following process.
 
 The training data used for this project are available here:
   
-  [Link](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)
+  [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)
 
 The test data are available here:
   
-  [link](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
+  [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
 Note: this pml-testing data contains 20 cases which we will use to predict if person is doing the exercise correctly.
 
-The description for this project comes from this source: [link](http://groupware.les.inf.puc-rio.br/har)
+The description for this project comes from this source: [http://groupware.les.inf.puc-rio.br/har](http://groupware.les.inf.puc-rio.br/har)
 Let's set up the environment.
-```{r echo=FALSE}
+
+```{r }
 # load the training and test data sets
 # Load libraries necessary for processing... caret,randomforest, etc
 library(caret)
@@ -48,7 +49,7 @@ Below are a list of steps in regard to the data cleansing process.
 3. I also saw no need to remove the  new_window= yes entries since the #DIV/0! entries were eliminated in step 4. I was originally going to remove the "new_window ==yes" entries but found no need to do so.
 
 
-```{r}
+```{r }
 #Read the 2 data sets
 `trainingset` <- read.csv(url("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"))
 `testset`     <- read.csv(url("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"))
