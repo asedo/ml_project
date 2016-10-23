@@ -126,18 +126,28 @@ $(document).ready(function () {
 
 <div id="machine-learning-submission" class="section level1">
 <h1>Machine Learning submission</h1>
-<p>The goal of this project is to look at a training data set that came from accelerometers on the belt, forearm, and dumbell of 6 participants which were asked to perform the exersizes correctly and incorrectly in 5 different ways. Using this data, we are to build a model and decide if the test set of 20 activities are doing the excersize corrrectly, or incorrectly. In general we will follow the following process. 1. load the data into a data frame 2. Check for data problems such as: irrelevant columns, missing values, out of range, etc. 3. Prepare the data for processing 4. Split or partition the data into training and testing data frames 5. Make sure classe a factor variable. 6. Create a data model from the training data using the train function 7. Use predict function to run the testing data through the model created by training data. 8. use the confusionmatrix to compare accuracy of model 9. predict the values from the 20 example observations and get the results ##About the Data set…</p>
+<p>The goal of this project is to look at a training data set that came from accelerometers on the belt, forearm, and dumbell of 6 participants which were asked to perform the exercizes correctly and incorrectly in 5 different ways. Using this data, we are to build a model and decide if the test set of 20 activities are doing the excersize corrrectly, or incorrectly.</p>
+<p>In general we will follow the following process.</p>
+<ol style="list-style-type: decimal">
+<li>Load the data into a data frame</li>
+<li>Check for data problems such as: irrelevant columns, missing values, out of range, etc.</li>
+<li>Prepare the data for processing</li>
+<li>Split or partition the data into training and testing data frames</li>
+<li>Make sure classe a factor variable.</li>
+<li>Create a data model from the training data using the train function</li>
+<li>Use predict function to run the testing data through the model created by training data.</li>
+<li>Use the confusionmatrix to compare accuracy of model</li>
+<li>Predict the values from the 20 example observations and get the results</li>
+</ol>
+<div id="about-the-data-set" class="section level2">
+<h2>About the Data set…</h2>
 <p>The training data used for this project are available here:</p>
 <p><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a></p>
 <p>The test data are available here:</p>
 <p><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv" class="uri">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a> Note: this pml-testing data contains 20 cases which we will use to predict if person is doing the exercise correctly.</p>
 <p>The description for this project comes from this source: <a href="http://groupware.les.inf.puc-rio.br/har" class="uri">http://groupware.les.inf.puc-rio.br/har</a> Let’s set up the environment.</p>
-<pre class="r"><code># load the training and test data sets
-# Load libraries necessary for processing... caret,randomforest, etc
-library(caret)</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
 <pre><code>## Loading required package: ggplot2</code></pre>
-<pre class="r"><code>library(randomForest)</code></pre>
 <pre><code>## randomForest 4.6-12</code></pre>
 <pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
 <pre><code>## 
@@ -145,10 +155,43 @@ library(caret)</code></pre>
 <pre><code>## The following object is masked from 'package:ggplot2':
 ## 
 ##     margin</code></pre>
-<pre class="r"><code>library(base)
-library(e1071)
-set.seed(123)</code></pre>
-<p>The easiest way to reduce processing time and increase accuracy is to reduce the number of variables and keep only relevant variables. To do this, I looked at the prediction data set(the dataset that has 20 rows). Below are a list of steps in regard to the data cleansing process. 1. When looking at how to process the training data, I first looked at the “Testing data”, the set of 20 observations you need to predict from. As you are looking at the Testing data set, you notice that most of the colums are NAs. When we eliminate those columns, data seems to be rather clean. Kind of surprised really. 2. I will then get rid of the names, time and date fields, and finally, the #DIV/0! entries. As stated above, #DIV/0! text was resolved by eliminating the columns that had NA on the testset(20 observations to validate on) 3. I also saw no need to remove the new_window= yes entries since the #DIV/0! entries were eliminated in step 4. I was originally going to remove the “new_window ==yes” entries but found no need to do so.</p>
+<p>The easiest way to reduce processing time and increase accuracy is to reduce the number of variables and keep only relevant variables. These are the steps I followed.</p>
+<ol style="list-style-type: decimal">
+<li>When looking at how to process the training data, I first looked at the “Testing data set”, the set of 20 observations you need to predict from. As you are looking at the Testing data set, you notice that most of the colums have NAs. When we eliminate those columns, data seems to be rather clean.</li>
+<li>I will then get rid of the names, time and date fields, and finally, the #DIV/0! entries. As stated above, #DIV/0! text was resolved by eliminating the columns that had NA on the testset(20 observations to validate on)</li>
+<li>I also saw no need to remove the new_window= yes entries since the #DIV/0! entries were eliminated in step 4. I was originally going to remove the “new_window ==yes” entries but found no need to do so.</li>
+</ol>
+<p>The output observations classes are as follows:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Class</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="left">Done exactly to specification</td>
+</tr>
+<tr class="even">
+<td align="left">B</td>
+<td align="left">Throwing the elbows to the front</td>
+</tr>
+<tr class="odd">
+<td align="left">C</td>
+<td align="left">Lifting the dumbbell only halfway</td>
+</tr>
+<tr class="even">
+<td align="left">D</td>
+<td align="left">lowering the dumbbell only halfway</td>
+</tr>
+<tr class="odd">
+<td align="left">E</td>
+<td align="left">Throwing the hips to the front</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>#Read the 2 data sets
 `trainingset` &lt;- read.csv(url(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;))
 `testset`     &lt;- read.csv(url(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;))
@@ -164,11 +207,11 @@ reducedtestset =testset[,testset.trainingcolnames]
 
 #partition the training set into the training set and testing set with a 60/40 split between training and testing data sets.
 inTrain = createDataPartition(reducedtrain$classe, p = 3/5)[[1]]
-training =reducedtrain[inTrain,]
+training = reducedtrain[inTrain,]
 testing =  reducedtrain[-inTrain,]</code></pre>
-<p>As identified using the trainControl funcion, I used K-fold cross validation (method = “repeatedcv”), using 5 folds (number=5), and repeated Repeated random sub-sampling validations (repeats = 3)</p>
-<p>We then used the train function to create the data model using random forests and the trainControl object. Once we have the training model built, we can use the predict function to pump the training data into the model, and predict the results, which in theory, should be close to the actual results which are given by the “classe” variable. Once we have the predicted values, and the known values, we can use the confusion matrix to evaluate how accurate our model is.</p>
-<p>About the confusionMatrix. As explained by the previous statement, the confusion Matrix compares the predicted results (pred.test) and the actual results (testing$classe),using our test data which is 40% of our total number of observations. The confusionMatrix function then outputs the Sensitivity, Specificity, Accuracy, the 95% Confidence interfal and other details relating to how the actual values and the predicted values compare. This information is extremely useful.</p>
+<p>As identified using the trainControl funcion, I used K-fold cross validation (method = “repeatedcv”), using 5 folds (number=5), and repeated random sub-sampling validations (repeats = 3)</p>
+<p>I then used the train function to create the data model using random forests and the trainControl object. Once we have the training model built, we can use the predict function to pump the training data into the model, and predict the results, which in theory, should be close to the actual results which are given by the “classe” variable. Once we have the predicted values, and the known values, we can use the confusion matrix to evaluate how accurate our model is.</p>
+<p>About the confusionMatrix. As explained by the previous statement, the confusion Matrix compares the predicted results (pred.test) and the actual results (testing$classe),using our test data which is 40% of our total number of observations. The confusionMatrix function then outputs the Sensitivity, Specificity, Accuracy, the 95% Confidence interval and other details relating to how the actual values and the predicted values compare. This information is extremely useful.</p>
 <pre class="r"><code>#to tune the random forest, I used the trainControl function. 
 #you can also use the expand.grid function but I didn't do it.
 trc = trainControl(method= &quot;repeatedcv&quot;, repeats = 3 , number = 5 )
@@ -227,44 +270,24 @@ cm.result$overall</code></pre>
 ## Detection Rate         0.2845   0.1935   0.1742   0.1639   0.1838
 ## Detection Prevalence   0.2845   0.1936   0.1742   0.1639   0.1838
 ## Balanced Accuracy      1.0000   0.9999   0.9996   1.0000   1.0000</code></pre>
-<p>You can see the output of the confusionMatrix function above. The output of the confusion matrix is held in the cm.result variable. Since we have great accuracy, better than .999, I can be quite confident that the 20 observation results, as displayed above, are quite accurate.</p>
+<p>You can see the output of the confusionMatrix function above. The output of the confusion matrix is held in the cm.result variable. Since we have great accuracy, better than .999, I can be quite confident that the 20 observation results, as displayed above, are quite accurate. As a matter of fact, the predicted Out of Sampling error is the estimated error which is expected by results not provided in the sample. This error is calculated by the formula: Out of sample error = 1-Accuracy.</p>
+<pre class="r"><code># 1- Accuracy = Sample Error
+
+#This means that the sample Error is...
+oosError = as.double(1- cm.result$overall[1])
+cat(&quot;Out of Sample Error is &quot;, oosError)</code></pre>
+<pre><code>## Out of Sample Error is  0.0001274535</code></pre>
+<p>As you can see from the above results, this seems to be a fairly accurate model with only a small amount of out of sample error. This is good news and means we can run the 20 observations through the model and be fairly confident that the classification of the exercise is correct.</p>
 <pre class="r"><code># Now we predict results for  20 observations
 result.20 = predict(mod.rf, reducedtestset)
 summary(result.20)</code></pre>
 <pre><code>##  A  B  C  D  E 
 ## 20  0  0  0  0</code></pre>
-<p>As you can se above, all 20 observations seem to be done “exactly according to the specification” or in other words, Class A observations. Observations classes are as follows:</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Class</th>
-<th align="left">Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">A</td>
-<td align="left">Done exactly to specification</td>
-</tr>
-<tr class="even">
-<td align="left">B</td>
-<td align="left">Throwing the elbows to the front</td>
-</tr>
-<tr class="odd">
-<td align="left">C</td>
-<td align="left">Lifting the dumbbell only halfway</td>
-</tr>
-<tr class="even">
-<td align="left">D</td>
-<td align="left">lowering the dumbbell only halfway</td>
-</tr>
-<tr class="odd">
-<td align="left">E</td>
-<td align="left">Throwing the hips to the front</td>
-</tr>
-</tbody>
-</table>
-<p>Submission details: Submission will consist of a link to a Github repo R markdown and compiled HTML file describing your analysis. Text of the writeup to &lt; 2000 words Number of figures to be less than 5. Submit a repo with a gh-pages branch so the HTML page can be viewed online</p>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>After cleansing the data and creating our model, we ran the testing data and predicted the results. We then compared the predicted results with the actual results and found the model results to be quite accurate. Lastly, we ran the 20 test observations through the model and found that all 20 observations were Class A observations. In other words, done “exactly according to the specification”.</p>
 </div>
 
 
